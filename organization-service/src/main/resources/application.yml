@@ -7,7 +7,7 @@ spring:
       ribbon:
         enabled: false
 server:
-  port: 8080
+  port: 8081
 
 #Setting the logging levels for the service
 logging:
