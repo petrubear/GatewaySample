@@ -1,5 +1,4 @@
 target/
-activemq-data/
 *.log
 *.log.*
 *.ipr
@@ -18,21 +17,4 @@ out
 .idea
 .idea*
 .DS_Store
-dependency-reduced-pom.xml
-junit*.properties
-release.properties
-projectFilesBackup
 target
-.externalToolBuilders
-maven-eclipse.xml
-bin-groovy
-atlassian-ide-plugin.private.xml
-atlassian-ide-plugin.xml
-*.MySCMServerInfo
-.svn
-rebel.xml
-rebel-remote.xml
-.rebel.xml.bak
-
-configuration/configuration.iml
-configuration/cassandra-configuration/cassandra-configuration.iml
