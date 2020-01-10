@@ -1,0 +1,45 @@
+spring:
+  cloud:
+    consul:
+      enabled: true
+      host: localhost
+      port: 8500
+    loadbalancer:
+      ribbon:
+        enabled: false
+    gateway:
+      discovery:
+        instanceId: ${spring.application.name}:${vcap.application.instance_id:${spring.application.instance_id:${random.value}}}
+        locator:
+          enabled: true
+          predicates:
+            - name: Path
+              args:
+                pattern: "'/api/' + serviceId + '/**'"
+          filters:
+            - name: RewritePath
+              args:
+                regexp: "'/api/' + serviceId + '/(?<remaining>.*)'"
+                replacement: "'/${remaining}'"
+management:
+  security:
+    enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+server:
+  port: 5555
+
+  #Setting logging levels
+logging:
+  level:
+    org.springframework.web: WARN
+    com.thoughtmechanix: DEBUG
+
+#
+#zuul:
+#  prefix:  /api
+#  routes:
+#    organizationservice: /organization/**
+#    licensingservice: /licensing/**

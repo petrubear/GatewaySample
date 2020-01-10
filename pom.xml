@@ -16,6 +16,7 @@
     </parent>
 
     <modules>
+        <module>gatewaysrv</module>
         <module>organization-service</module>
         <module>licensing-service</module>
         <module>confsrv</module>
