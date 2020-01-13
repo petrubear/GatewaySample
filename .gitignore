@@ -18,3 +18,7 @@ out
 .idea*
 .DS_Store
 target
+
+bin/
+obj/
+
