@@ -13,14 +13,13 @@ namespace TodoApi.Infraestructure
 {
     public class ConsulHostedService : IHostedService
     {
-        private Task _executingTask;
         private CancellationTokenSource _cts;
         private readonly IConsulClient _consulClient;
         private readonly IOptions<ConsulConfig> _consulConfig;
         private readonly ILogger<ConsulHostedService> _logger;
         private readonly IServer _server;
         private readonly ApplicationConfig _appConfig;
-        private string _registrationID;
+        private string _registrationId;
 
         public ConsulHostedService(IConsulClient consulClient, IOptions<ConsulConfig> consulConfig,
             ILogger<ConsulHostedService> logger, IServer server, ApplicationConfig applicationConfig)
@@ -49,11 +48,11 @@ namespace TodoApi.Infraestructure
             var address = addresses.Addresses.First();
 
             var uri = new Uri(address);
-            _registrationID = $"{_consulConfig.Value.ServiceID}-{uri.Port}";
+            _registrationId = $"{_consulConfig.Value.ServiceId}-{uri.Port}";
 
             var registration = new AgentServiceRegistration()
             {
-                ID = _registrationID,
+                ID = _registrationId,
                 Name = _consulConfig.Value.ServiceName,
                 Address = $"{uri.Host}",
                 Port = uri.Port,
@@ -66,7 +65,7 @@ namespace TodoApi.Infraestructure
                 }
             };
 
-            _logger.LogInformation("Registering in Consul");
+            _logger.LogInformation("Registering in Consul: " + _registrationId);
             await _consulClient.Agent.ServiceDeregister(registration.ID, _cts.Token);
             await _consulClient.Agent.ServiceRegister(registration, _cts.Token);
         }
@@ -77,7 +76,7 @@ namespace TodoApi.Infraestructure
             _logger.LogInformation("Deregistering from Consul");
             try
             {
-                await _consulClient.Agent.ServiceDeregister(_registrationID, cancellationToken);
+                await _consulClient.Agent.ServiceDeregister(_registrationId, cancellationToken);
             }
             catch (Exception ex)
             {

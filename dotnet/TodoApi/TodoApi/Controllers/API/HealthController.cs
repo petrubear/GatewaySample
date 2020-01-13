@@ -8,7 +8,6 @@ namespace TodoApi.Controllers.API
     public class HealthController : ControllerBase
     {
         [HttpGet("health")]
-        //public IActionResult Status() => Ok();
-        public String Status() => "{\"status\": \"UP\"}";
+        public string Status() => "{\"status\": \"UP\"}";
     }
 }
