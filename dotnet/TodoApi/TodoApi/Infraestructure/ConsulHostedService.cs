@@ -38,7 +38,6 @@ namespace TodoApi.Infraestructure
             _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
             var defaultAddress = _appConfig.DefaultAddress;
-            //"http://192.168.99.84:5001";
             var features = _server.Features;
             var addresses = features.Get<IServerAddressesFeature>();
             if (addresses.Addresses.Count == 0)
