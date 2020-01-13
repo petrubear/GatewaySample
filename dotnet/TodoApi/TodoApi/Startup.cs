@@ -35,6 +35,12 @@ namespace TodoApi
                 var address = Configuration["consulConfig:address"];
                 consulConfig.Address = new Uri(address);
             }));
+
+
+            var appConfig = new ApplicationConfig();
+            var defaultAddress = Configuration["DefaultAddress"];
+            appConfig.DefaultAddress = defaultAddress;
+            services.AddSingleton(appConfig);
             services.AddControllers();
         }
 

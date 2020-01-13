@@ -19,15 +19,17 @@ namespace TodoApi.Infraestructure
         private readonly IOptions<ConsulConfig> _consulConfig;
         private readonly ILogger<ConsulHostedService> _logger;
         private readonly IServer _server;
+        private readonly ApplicationConfig _appConfig;
         private string _registrationID;
 
         public ConsulHostedService(IConsulClient consulClient, IOptions<ConsulConfig> consulConfig,
-            ILogger<ConsulHostedService> logger, IServer server)
+            ILogger<ConsulHostedService> logger, IServer server, ApplicationConfig applicationConfig)
         {
             _server = server;
             _logger = logger;
             _consulConfig = consulConfig;
             _consulClient = consulClient;
+            _appConfig = applicationConfig;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -35,9 +37,17 @@ namespace TodoApi.Infraestructure
             // Create a linked token so we can trigger cancellation outside of this token's cancellation
             _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
+            var defaultAddress = _appConfig.DefaultAddress;
+            //"http://192.168.99.84:5001";
             var features = _server.Features;
             var addresses = features.Get<IServerAddressesFeature>();
-            var address = "http://192.168.99.84:5001"; //addresses.Addresses.First();
+            if (addresses.Addresses.Count == 0)
+            {
+                _logger.LogInformation("Using default Address: " + defaultAddress);
+                addresses.Addresses.Add(defaultAddress);
+            }
+
+            var address = addresses.Addresses.First();
 
             var uri = new Uri(address);
             _registrationID = $"{_consulConfig.Value.ServiceID}-{uri.Port}";
@@ -46,16 +56,15 @@ namespace TodoApi.Infraestructure
             {
                 ID = _registrationID,
                 Name = _consulConfig.Value.ServiceName,
-                //Address = $"{uri.Scheme}://{uri.Host}",
                 Address = $"{uri.Host}",
                 Port = uri.Port,
-                Tags = new[] {"dotnet"},
+                Tags = new[] {"secure=false", "dotnet"},
                 Check = new AgentServiceCheck()
-                                {
-                                    HTTP = "http://192.168.99.84:5001/actuator/health",//$"{uri.Scheme}://{uri.Host}:{uri.Port}/actuator/health",
-                                    Timeout = TimeSpan.FromSeconds(3),
-                                    Interval = TimeSpan.FromSeconds(10)
-                                }
+                {
+                    HTTP = $"{uri.Scheme}://{uri.Host}:{uri.Port}/actuator/health",
+                    Timeout = TimeSpan.FromSeconds(3),
+                    Interval = TimeSpan.FromSeconds(10)
+                }
             };
 
             _logger.LogInformation("Registering in Consul");
